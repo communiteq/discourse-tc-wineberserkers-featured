@@ -1,12 +1,6 @@
 featured_tag:
   default: featured
 
-number_of_topics:
-  default: 3
-  min: 1
-  max: 5
-  description: Display up to 5 topics at max-width
-
 hide_featured_tag:
   default: false
   description: When enabled the tag "featured tag" set above will be invisible to normal users when viewing topics.
@@ -20,6 +14,10 @@ show_on:
     - all
   description: top_menu refers to pages set in the <a href="/admin/site_settings/category/all_results?filter=top_menu">top menu site setting</a>
 
+show_on_category_ids:
+  type: list
+  default: ""
+  description: show on these categories, identified by their numeric ID's.
 show_for:
   default: everyone
   type: enum
@@ -67,3 +65,11 @@ featured_content_position:
     - below_discovery_categories
     - discovery_list_controls_above
   description: Advanced theme development&colon; this changes the plugin outlet for the component
+
+change_interval:
+  default: 600
+  description: Change the topics every x seconds.
+
+topic_configuration:
+  default: ""
+  type: list

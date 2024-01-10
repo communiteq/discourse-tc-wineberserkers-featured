@@ -4,6 +4,7 @@ import { action } from "@ember/object";
 import { tracked } from "@glimmer/tracking";
 import { defaultHomepage } from "discourse/lib/utilities";
 import I18n from "I18n";
+import Category from "discourse/models/category";
 
 const FEATURED_CLASS = "featured-homepage-topics";
 
@@ -14,13 +15,26 @@ export default class FeaturedHomepageTopics extends Component {
   @service currentUser;
   @service keyValueStore;
 
+  @tracked numSet = Math.round((new Date()).getTime() / (1000 * settings.change_interval));
+  @tracked numShuffle = 0;
   @tracked featuredTagTopics = null;
-  @tracked toggleTopics =
-    this.keyValueStore.getItem("toggleTopicsState") === "true" || false;
+  @tracked toggleTopics = this.keyValueStore.getItem("toggleTopicsState") === "true" || false;
 
   constructor() {
     super(...arguments);
+    this.startClock();
     this.router.on("routeDidChange", this.checkShowHere);
+  }
+
+  startClock() {
+    this.timer = setInterval(() => {
+        var newSet = Math.round((new Date()).getTime() / (1000 * settings.change_interval));
+        if (newSet != this.numSet) {
+          this.numSet = newSet;
+          this.getBannerTopics();
+        }
+    }
+    , 1000);
   }
 
   @action
@@ -31,6 +45,7 @@ export default class FeaturedHomepageTopics extends Component {
 
   willDestroy() {
     this.router.off("routeDidChange", this.checkShowHere);
+    clearInterval(this.timer);
   }
 
   @action
@@ -42,6 +57,15 @@ export default class FeaturedHomepageTopics extends Component {
     const { currentRoute, currentRouteName } = this.router;
 
     if (currentRoute) {
+      let category = currentRoute.params.category_slug_path_with_id ?
+        Category.findBySlugPathWithID(currentRoute.params.category_slug_path_with_id) : null;
+
+      if (category && category.id) {
+        console.log(category);
+        if (settings.show_on_category_ids.split('|').map(Number).includes(category.id)) {
+          return true;
+        }
+      }
       switch (settings.show_on) {
         case "homepage":
           return currentRouteName === `discovery.${defaultHomepage()}`;
@@ -105,11 +129,29 @@ export default class FeaturedHomepageTopics extends Component {
       },
     });
 
-    this.featuredTagTopics = topicList.topics
+    const featuredTopics = topicList.topics
       .filter(
         (topic) =>
           topic.image_url && (!settings.hide_closed_topics || !topic.closed)
-      )
-      .slice(0, settings.number_of_topics);
+      );
+
+    if (settings.topic_configuration != "") {
+      var filteredTopics = [];
+      var tc = settings.topic_configuration.split('|');
+      var i = this.numSet % tc.length;
+      var ids = tc[i].split(',').map(id => parseInt(id, 10));
+
+      ids.forEach(id => {
+        const topic = featuredTopics.find(topic => topic.id === id);
+
+        if (topic) {
+            filteredTopics.push(topic);
+        } else {
+            console.log("Could not load topic #" + id + ", maybe it's closed or it does not have an image");
+        }
+    });
+
+      this.featuredTagTopics = filteredTopics;
+    }
   }
 }
