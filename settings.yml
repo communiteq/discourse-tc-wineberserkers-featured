@@ -18,6 +18,7 @@ show_on_category_ids:
   type: list
   default: ""
   description: show on these categories, identified by their numeric ID's.
+
 show_for:
   default: everyone
   type: enum
@@ -25,6 +26,7 @@ show_for:
     - everyone
     - logged_in
     - logged_out
+    - admin_only
 
 make_collapsible:
   default: false

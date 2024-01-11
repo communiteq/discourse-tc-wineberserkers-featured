@@ -93,7 +93,8 @@ export default class FeaturedHomepageTopics extends Component {
     if (
       settings.show_for === "everyone" ||
       (settings.show_for === "logged_out" && !this.currentUser) ||
-      (settings.show_for === "logged_in" && this.currentUser)
+      (settings.show_for === "logged_in" && this.currentUser) ||
+      (settings.show_for === "admin_only" && this.currentUser && this.currentUser.admin)
     ) {
       return true;
     } else {
