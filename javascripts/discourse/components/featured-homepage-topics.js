@@ -15,8 +15,8 @@ export default class FeaturedHomepageTopics extends Component {
   @service currentUser;
   @service keyValueStore;
 
-  @tracked numSet = Math.round((new Date()).getTime() / (1000 * settings.change_interval));
-  @tracked numShuffle = 0;
+  @tracked numSet = Math.floor((new Date()).getTime() / (1000 * settings.change_interval));
+  @tracked shuffle = Math.floor((new Date()).getTime() / (1000 * settings.shuffle_interval));
   @tracked featuredTagTopics = null;
   @tracked toggleTopics = this.keyValueStore.getItem("toggleTopicsState") === "true" || false;
 
@@ -28,11 +28,21 @@ export default class FeaturedHomepageTopics extends Component {
 
   startClock() {
     this.timer = setInterval(() => {
-        var newSet = Math.round((new Date()).getTime() / (1000 * settings.change_interval));
-        if (newSet != this.numSet) {
-          this.numSet = newSet;
-          this.getBannerTopics();
+      var newSet = Math.floor((new Date()).getTime() / (1000 * settings.change_interval));
+      var shuffle = Math.floor((new Date()).getTime() / (1000 * settings.shuffle_interval));
+      if (newSet != this.numSet) {
+        this.numSet = newSet;
+        this.shuffle = shuffle;
+        this.getBannerTopics();
+      }
+      else {
+        if (shuffle != this.shuffle) {
+          this.shuffle = shuffle;
+          if (this.featuredTagTopics.length > 0) {
+            this.featuredTagTopics = [...this.featuredTagTopics.slice(1), this.featuredTagTopics[0]];
         }
+        }
+      }
     }
     , 1000);
   }
@@ -146,13 +156,12 @@ export default class FeaturedHomepageTopics extends Component {
 
       ids.forEach(id => {
         const topic = featuredTopics.find(topic => topic.id === id);
-
         if (topic) {
             filteredTopics.push(topic);
         } else {
             console.log("Could not load topic #" + id + ", maybe it's closed or it does not have an image");
         }
-    });
+      });
 
       this.featuredTagTopics = filteredTopics;
     }

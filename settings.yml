@@ -73,6 +73,10 @@ change_interval:
   default: 600
   description: Change the topics every x seconds.
 
+shuffle_interval:
+  default: 120
+  description: Shuffle the topics every x seconds. Make sure change_interval is an exact multiple of this number.
+
 topic_configuration:
   default: ""
   type: list
