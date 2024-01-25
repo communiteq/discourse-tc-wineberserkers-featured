@@ -59,7 +59,7 @@ export default class FeaturedHomepageTopics extends Component {
     });
     var t = (new Date()).getTime() + (settings.adjust_secs * 1000);
     var currentSet = settings.adjust_rows + Math.floor(t / (1000 * settings.change_interval));
-    console.log("current set is #" + (1 + (currentSet % tc.length)));
+    console.log("current set is #" + (1 + (currentSet % tc.length)) + " of " + tc.length);
     var currentFloor = Math.floor(t / (1000 * settings.change_interval));
     var nextIncrement = (currentFloor + 1) * (1000 * settings.change_interval);
     var nextIncrementTime = new Date(nextIncrement + (settings.adjust_secs * 1000));
