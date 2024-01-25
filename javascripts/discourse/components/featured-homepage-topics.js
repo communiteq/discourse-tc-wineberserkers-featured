@@ -57,19 +57,19 @@ export default class FeaturedHomepageTopics extends Component {
         }
       });
     });
-    var t = (new Date()).getTime() + (settings.adjust_secs * 1000);
+    var t = (new Date()).getTime();
     var currentSet = settings.adjust_rows + Math.floor(t / (1000 * settings.change_interval));
     console.log("current set is #" + (1 + (currentSet % tc.length)) + " of " + tc.length);
     var currentFloor = Math.floor(t / (1000 * settings.change_interval));
     var nextIncrement = (currentFloor + 1) * (1000 * settings.change_interval);
-    var nextIncrementTime = new Date(nextIncrement + (settings.adjust_secs * 1000));
+    var nextIncrementTime = new Date(nextIncrement);
     console.log("Current time:        " + (new Date()).toString());
     console.log("Next increment time: " + nextIncrementTime.toString());
   }
 
   startClock() {
     this.timer = setInterval(() => {
-      var t = (new Date()).getTime() - (settings.adjust_secs * 1000);
+      var t = (new Date()).getTime();
       var newSet = settings.adjust_rows + Math.floor(t / (1000 * settings.change_interval));
       var shuffle = Math.floor(t / (1000 * settings.shuffle_interval));
       if (newSet != this.numSet) {

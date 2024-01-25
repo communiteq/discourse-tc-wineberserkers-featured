@@ -85,10 +85,6 @@ adjust_rows:
   default: 0
   description: Skip X rows (to align at a specific time)
 
-adjust_secs:
-  default: 0
-  description: Shift X seconds (to align at a specific time)
-
 config_output:
   default: false
   type: bool
