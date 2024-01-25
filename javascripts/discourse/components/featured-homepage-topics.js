@@ -15,21 +15,63 @@ export default class FeaturedHomepageTopics extends Component {
   @service currentUser;
   @service keyValueStore;
 
-  @tracked numSet = Math.floor((new Date()).getTime() / (1000 * settings.change_interval));
-  @tracked shuffle = Math.floor((new Date()).getTime() / (1000 * settings.shuffle_interval));
+  @tracked numSet = 0;
+  @tracked shuffle = 0;
   @tracked featuredTagTopics = null;
   @tracked toggleTopics = this.keyValueStore.getItem("toggleTopicsState") === "true" || false;
 
   constructor() {
     super(...arguments);
+    if (settings.config_output) {
+      this.configOutput();
+    }
     this.startClock();
     this.router.on("routeDidChange", this.checkShowHere);
   }
 
+  async configOutput() {
+    const sortOrder = settings.sort_by_created ? "created" : "activity";
+    const topicList = await this.store.findFiltered("topicList", {
+      filter: "latest",
+      params: {
+        tags: [`${settings.featured_tag}`],
+        order: sortOrder,
+      },
+    });
+
+    const featuredTopics = topicList.topics
+      .filter(
+        (topic) =>
+          topic.image_url && (!settings.hide_closed_topics || !topic.closed)
+      );
+
+    var tc = settings.topic_configuration.split('|');
+    tc.forEach(row => {
+      var ids = row.split(',').map(id => parseInt(id, 10));
+      ids.forEach(id => {
+        const topic = featuredTopics.find(topic => topic.id === id);
+        if (topic) {
+            console.log("Topic "+ id+ ": ok");
+        } else {
+            console.log("Topic "+ id+ ": something wrong");
+        }
+      });
+    });
+    var t = (new Date()).getTime() + (settings.adjust_secs * 1000);
+    var currentSet = settings.adjust_rows + Math.floor(t / (1000 * settings.change_interval));
+    console.log("current set is #" + (1 + (currentSet % tc.length)));
+    var currentFloor = Math.floor(t / (1000 * settings.change_interval));
+    var nextIncrement = (currentFloor + 1) * (1000 * settings.change_interval);
+    var nextIncrementTime = new Date(nextIncrement + (settings.adjust_secs * 1000));
+    console.log("Current time:        " + (new Date()).toString());
+    console.log("Next increment time: " + nextIncrementTime.toString());
+  }
+
   startClock() {
     this.timer = setInterval(() => {
-      var newSet = Math.floor((new Date()).getTime() / (1000 * settings.change_interval));
-      var shuffle = Math.floor((new Date()).getTime() / (1000 * settings.shuffle_interval));
+      var t = (new Date()).getTime() - (settings.adjust_secs * 1000);
+      var newSet = settings.adjust_rows + Math.floor(t / (1000 * settings.change_interval));
+      var shuffle = Math.floor(t / (1000 * settings.shuffle_interval));
       if (newSet != this.numSet) {
         this.numSet = newSet;
         this.shuffle = shuffle;
@@ -38,7 +80,7 @@ export default class FeaturedHomepageTopics extends Component {
       else {
         if (shuffle != this.shuffle) {
           this.shuffle = shuffle;
-          if (this.featuredTagTopics.length > 0) {
+          if ((this.featuredTagTopics) && (this.featuredTagTopics.length > 0)) {
             this.featuredTagTopics = [...this.featuredTagTopics.slice(1), this.featuredTagTopics[0]];
         }
         }
