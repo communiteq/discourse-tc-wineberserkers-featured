@@ -46,9 +46,9 @@ export default class FeaturedHomepageTopics extends Component {
           topic.image_url && (!settings.hide_closed_topics || !topic.closed)
       );
 
-    if (featuredTopics.topics.length != topicList.topics.length) {
-      console.log("Filtered " + topicList.topics.length - featuredTopics.topics.length + " featured topics");
-      console.log(topicList);
+    if (featuredTopics.length != topicList.topics.length) {
+      console.log("Filtered " + topicList.topics.length - featuredTopics.length + " featured topics");
+      console.log(topicList.topics);
       console.log(featuredTopics);
     } else {
       console.log("No topics filtered");
