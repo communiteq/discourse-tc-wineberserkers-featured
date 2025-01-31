@@ -39,7 +39,6 @@ export default class FeaturedHomepageTopics extends Component {
       },
     });
     console.log("Loaded " + topicList.topics.length + " featured topics");
-    console.log(topicList);
 
     const featuredTopics = topicList.topics
       .filter(
@@ -47,8 +46,13 @@ export default class FeaturedHomepageTopics extends Component {
           topic.image_url && (!settings.hide_closed_topics || !topic.closed)
       );
 
-    console.log("Filtered " + topicList.topics.length + " featured topics");
-    console.log(featuredTopics);
+    if (featuredTopics.topics.length != topicList.topics.length) {
+      console.log("Filtered " + topicList.topics.length - featuredTopics.topics.length + " featured topics");
+      console.log(topicList);
+      console.log(featuredTopics);
+    } else {
+      console.log("No topics filtered");
+    }
 
     var tc = settings.topic_configuration.split('|');
     tc.forEach(row => {
