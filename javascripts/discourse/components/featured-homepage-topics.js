@@ -38,12 +38,17 @@ export default class FeaturedHomepageTopics extends Component {
         order: sortOrder,
       },
     });
+    console.log("Loaded " + topicList.topics.length + " featured topics");
+    console.log(topicList);
 
     const featuredTopics = topicList.topics
       .filter(
         (topic) =>
           topic.image_url && (!settings.hide_closed_topics || !topic.closed)
       );
+
+    console.log("Filtered " + topicList.topics.length + " featured topics");
+    console.log(featuredTopics);
 
     var tc = settings.topic_configuration.split('|');
     tc.forEach(row => {
